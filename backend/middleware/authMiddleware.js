@@ -1,27 +1,23 @@
 const jwt = require('jsonwebtoken')
-const secret = "SECRET_KEY"
+
 
 module.exports = function () {
     return function (req, res, next) {
         console.log(req.headers.authorization)
         if (!req.headers.authorization) {
-            req.user = false;
-            console.log("no header")
+            req.error = "UserIsNotAuthorized";
             next()
         }
         else {
             try {
+                //console.log("header")
                 const token = req.headers.authorization.split(' ')[1]
-                const decodedData = jwt.verify(token, secret)
-                console.log(decodedData)
-                req.user = {
-                    email: decodedData.email,
-                    role: decodedData.roles,
-                    token: decodedData.token
-                }
+                const decodedData = jwt.verify(token, process.env.JWT_ACCESS_SECRET)
+                //console.log(decodedData)
+
                 next()
             } catch (e) {
-                req.user = false;
+                req.error = "UserIsNotAuthorized";
                 console.log(e)
                 next()
             }

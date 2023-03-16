@@ -1,10 +1,11 @@
 const User = require('./../dbManage/user')
 const Token = require('./../dbManage/token')
 const UserService = require('./../service/userService')
+const tokenService = require('./../service/tokenService');
 //const { validationResult } = require('express-validator')
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const secret = "SECRET_KEY"
+const { UserAlreadyExist, IncorrectActivationLink } = require('../localErrors');
 
 const generateAccessToken = (id, email, roles) => {
     const payload = {
@@ -12,49 +13,60 @@ const generateAccessToken = (id, email, roles) => {
         email,
         roles
     }
-    return jwt.sign(payload, "SECRET_KEY", {expiresIn: "24h"} )
+    return jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {expiresIn: "24h"} )
 }
 
 class authController {
     async registration(req, res, next) {
         try {
             const {email, password} = req.body;
-            //console.log(email, password)
+            console.log(req.body)
             const userData = await UserService.registration(email, password);
-            //console.log(userData)
-            res.cookie('refreshToken', userData.refreshToken, {maxAge: 30*24*60*60*1000, httpOnly: true});
+            //res.setHeader('Set-Cookie', `refreshToken=${userData.refreshToken}`)
+            //res.cookie('refreshToken', userData.refreshToken, {maxAge: 30*24*60*60*1000});
             return res.json(userData);
 
         } catch (e) {
             console.log(e)
-            res.json({statusRegistration: "error"})
+            if (e instanceof UserAlreadyExist) {
+                return res.json({error: e.message})
+            }
+            return res.json({error: "Произошла ошибка на сервере, попробуйте позже"});
         }
     }
 
     async login(req, res, next) {
         try {
             const {email, password} = req.body;
-            let user;
-            User.findByEmail(email, (err, rows, next) => {
-                if (err) return next(err)
-                if (rows.length == 0) {
-                    return res.json({statusLogin: "userNotExist"})
-                } else {  
-                    user = rows[0];
-                    ifExist()
-                }
-            });
-            function ifExist() {
-                const validPassword = bcrypt.compareSync(password, user.password)
-                if (!validPassword) {
-                    return res.json({statusLogin: "invalidPassword"})
-                }
-                const token = generateAccessToken(user._id, user.email, user.roles)
-                return res.json({statusLogin: "success", token: token, email: email, role: user.roles})
+
+            let user = await User.find("email", email)
+            if (!user) {
+                return res.json({error: "Пользователя с таким email не существует"})
             }
+
+            const validPassword = bcrypt.compareSync(password, user.password)
+            if (!validPassword) {
+                return res.json({error: "Неверный пароль"})
+            }
+
+            let payload = {
+                email: email,
+            }
+            const tokens = tokenService.generateTokens(payload);
+
+            await tokenService.saveToken(email, tokens.refreshToken);
+
+            const userData = {
+                userId: user._id,
+                userEmail: user.email,
+                refreshToken: tokens.refreshToken,
+                accessToken: tokens.accessToken,
+                isActivated: user.isActivated,
+            }
+            return res.json(userData)
         } catch (e) {
             console.log(e)
-            res.json({statusLogin: "error"})
+            res.json({error: "Произошла ошибка на сервере, попробуйте позже"})
         }
     }
 
@@ -70,19 +82,34 @@ class authController {
         try {
             
             const activationLink = req.params.link;
-            //console.log(activationLink)
             await UserService.activate(activationLink);
-            return {"message":"activated"}
+            return res.json({"message":"activated"})
         } catch (e) {
-
+            if (e instanceof IncorrectActivationLink) {
+                return res.json({error: e.message})
+            }
         }
     }
 
     async refresh(req, res, next) {
         try {
+            const token = req.body.refreshToken;
+            //const refreshToken = Token.find("refreshToken", token)
 
+            const decodedData = jwt.verify(token, process.env.JWT_REFRESH_SECRET)
+            console.log(decodedData)
+            let payload = {
+                email: decodedData.email,
+            }
+            const tokens = tokenService.generateTokens(payload);
+            tokenService.saveToken(decodedData.email, tokens.refreshToken);
+            return res.json({
+                refreshToken: tokens.refreshToken,
+                accessToken: tokens.accessToken,
+            })
         } catch (e) {
-
+            console.log(e)
+            return res.json({error: "Произошла ошибка на сервере, попробуйте позже"})
         }
     }
 
@@ -121,46 +148,6 @@ class authController {
                 
         } catch (err) {
             console.log(err)
-        }
-    }
-
-    async getUsers(req, res) {
-        try {
-            if (req.user.role == 'admin') {
-                User.all((err, rows, next) => {
-                    if (err) return next(err) 
-                    return res.json({status: "success", users: rows})
-                });
-            } else {
-                return res.json({status: "NoPermission"})
-            }
-        } catch (e) {
-            console.log(e)
-            res.json({status: "error"})
-        }
-    }
-
-    async deleteUserByEmail(req, res) {
-        try {
-            let email = req.body.email;
-            User.deleteByEmail(email, (err) => {
-                if (err) return next(err)
-                res.json({message:"Пользователь удалён"})
-            })
-        } catch (e) {
-            console.log(e)
-        }
-    }
-
-    async deleteUserById(req, res) {
-        try {
-            let id = req.body.id;
-            User.deleteById(id, (err) => {
-                if (err) return next(err)
-                res.json({message:"Пользователь удалён"})
-            })
-        } catch (e) {
-            console.log(e)
         }
     }
 }

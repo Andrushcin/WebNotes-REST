@@ -18,6 +18,7 @@
               </div>
               <p v-if="password != password2 & password2 != ''">Пароли не совпадают</p>
               <p v-if="password.length < 8 & password != ''">Пароль слишком короткий</p>
+              <p v-if="error != ''" class="text-warning">{{ error }}</p>
               <button v-if="email != '' & password == password2 & password.length > 8" class="btn btn-primary mt-2" type="submit">Регистрация</button>
           </form>
   
@@ -30,12 +31,15 @@
                   <RouterLink class="ml-2" to="/">Узнайте о функциях сайта WebNotes</RouterLink>
               </small>
           </div>
+
+          <button @click="seeStorage()">Глядеть localStorage</button>
     </div>
 </template>
 
 <script>
 /* eslint-disable */
 import { RouterLink } from 'vue-router'
+import {$host, $authHost} from "./../http";
 
 export default {
     data () {
@@ -43,15 +47,36 @@ export default {
             email: "",
             password: "",
             password2: "",
+            error: "",
         }
     },
     computed: {
 
     },
-    methods() {
-        onSubmit () {
-            fetch()
+    methods: {
+        async onSubmit () {
+            let data = {
+                email: this.email,
+                password: this.password,
+            }
+
+            let response = await $host.post("/auth/registration", data)
+            let result = await response.data
+            if (result.error) {
+                this.error = result.error
+            } else {
+                localStorage.setItem('refreshToken', result.refreshToken)
+                localStorage.setItem('accessToken', result.accessToken)
+
+                this.$router.push({name: 'Мои заметки'});
+            }
+        },
+
+        async seeStorage () {
+            console.log(localStorage.getItem("refreshToken"))
+            console.log(localStorage.getItem("accessToken"))
         }
+
     }
 
 }

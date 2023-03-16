@@ -10,9 +10,13 @@ class TokenService {
             refreshToken
         }
     }
-
-    async saveToken(userEmail, refreshToken) {
-        Token.create(userEmail, refreshToken)
+    async saveToken(email, refreshToken) {
+        let token = await Token.find("userEmail", email);
+        if (token) {
+            await token.update("refreshToken", refreshToken)
+        } else {
+            await new Token(email, refreshToken).create();
+        }
     }
 }
 

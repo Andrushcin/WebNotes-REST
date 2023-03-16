@@ -71,7 +71,7 @@ class Token {
         return promise
     }
 
-    async delete() {
+    static async delete() {
         let promise = new Promise((resolve, reject) => {
 
             db.all(`DELETE FROM tokens WHERE userEmail = ?`, this.userEmail, (err) => {
@@ -90,10 +90,8 @@ class Token {
         if (!allowedFields.some((elem) => elem == field)) {
             throw new Error(`Недопустимый тип поля field: "${field}". Разрешённые типы: ${allowedFields}`)
         }
-
         const updateToken = () => {
             let promise = new Promise((resolve, reject) => {
-                console.log(field, value)
                 db.run(`UPDATE tokens 
                         SET ${field} = ?
                         WHERE id = ${this._id};`, value, (err) => {
@@ -120,4 +118,4 @@ class Token {
 
 }
 
-module.exports = Token
+module.exports = Token;

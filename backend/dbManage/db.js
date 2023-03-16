@@ -16,7 +16,7 @@ db.serialize(() => {
 
     let sqlToken = `
     CREATE TABLE IF NOT EXISTS tokens
-            (userEmail text, refreshToken text)
+            (id integer primary key, userEmail text, refreshToken text)
     `
     db.run(sqlToken)
 })
