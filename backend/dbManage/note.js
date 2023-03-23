@@ -1,20 +1,23 @@
 const db = require('./db')
 
-class User {
-    constructor(email, password, activationLink, isActivated=false, id=null) {
-        this.email = email;
-        this.password = password;
-        this.activationLink = activationLink;
-        this.isActivated = isActivated;
+class Note {
+    constructor(userEmail, name, body, fav=false, deleted=false, dateUpdate, dateCreate, id=null) {
+        this.userEmail = userEmail;
+        this.name = name;
+        this.body = body;
+        this.fav = fav;
+        this.deleted = deleted;
+        this.dateUpdate = dateUpdate;
+        this.dateCreate = dateCreate;
         this._id = id;
     }
     
     async create() {
-        let sql = `INSERT INTO users(email, password, activationLink, isActivated)
-            VALUES(?, ?, ?, ?)`
-        const createUser = () => { 
+        let sql = `INSERT INTO notes(userEmail, name, body, fav, deleted, dateUpdate, dateCreate)
+            VALUES(?, ?, ?, ?, ?, ?, ?)`
+        const createNote = () => { 
             let promise = new Promise((resolve, reject) => {
-                db.run(sql, [this.email, this.password, this.activationLink, this.isActivated], (err) => {
+                db.run(sql, [this.userEmail, this.name, this.body, this.fav, this.deleted, new Date(), new Date()], (err) => {
                     if (err) {
                         reject(err);
                     }
@@ -25,9 +28,9 @@ class User {
         }
 
         let promise = new Promise((resolve, reject) => {
-            createUser()
+            createNote()
                 .then(() => {
-                    resolve(User.find("email", this.email))
+                    resolve(Note.find("userEmail", this.userEmail))
                 })
                 .catch((err) => {
                     reject(err)})
@@ -37,7 +40,7 @@ class User {
     }
 
     static async find(field="", value="") {
-        let allowedFields = ["id", "email", "activationLink"]
+        let allowedFields = ["id", "userEmail", "fav", "deleted"]
 
         if (!allowedFields.some((elem) => elem == field)) {
             throw new Error(`Недопустимый тип поля field: "${field}". Разрешённые типы: ${allowedFields}`)
@@ -46,11 +49,11 @@ class User {
         const getRow = () => {
             let promise = new Promise((resolve, reject) => {
 
-                db.all(`SELECT * FROM users WHERE ${field} = ?`, value, (err, row) => {
+                db.all(`SELECT * FROM notes WHERE ${field} = ?`, value, (err, rows) => {
                     if (err) {
                         reject(err);
                     }
-                    resolve(row);
+                    resolve(rows);
                 });
             });
             return promise
@@ -58,10 +61,15 @@ class User {
 
         let promise = new Promise((resolve, reject) => {
             getRow()
-                .then((row) => {
-                    if (row.length > 0) {
-                        let u = new User(row[0].email, row[0].password, row[0].activationLink, row[0].isActivated, row[0].id)
-                        resolve(u)
+                .then((rows) => {
+                    if (rows.length > 0) {
+                        let arr = Array();
+                        for (let i=0; i < rows.length; i++) {
+                            let u = new Note(rows[i].userEmail, rows[i].name, rows[i].body, rows[i].fav, rows[i].deleted, rows[i].dateUpdate, rows[i].dateCreate, rows[i].id)
+                            arr.push(u)
+                        }
+
+                        resolve(arr)
                     } else {
                         resolve(null)
                     }
@@ -76,28 +84,29 @@ class User {
     async delete() {
         let promise = new Promise((resolve, reject) => {
 
-            db.all(`DELETE FROM users WHERE email = ?`, this.email, (err) => {
+            db.all(`DELETE FROM notes WHERE userEmail = ?`, this.userEmail, (err) => {
                 if (err) {
                     reject(err);
                 }
-                resolve(`Удалён пользователь с email = ${this.email}`);
+                resolve(`Удалена заметка "${this.name}"`);
             });
         });
         return promise
     }
 
     async update(field, value) {
-        let allowedFields = ["email", "password", "activationLink", "isActivated"]
+        let allowedFields = ["userEmail", "name", "body", "fav", "deleted"]
 
         if (!allowedFields.some((elem) => elem == field)) {
             throw new Error(`Недопустимый тип поля field: "${field}". Разрешённые типы: ${allowedFields}`)
         }
 
-        const updateUser = () => {
+        const updateNote = () => {
             let promise = new Promise((resolve, reject) => {
                 console.log(field, value)
-                db.run(`UPDATE users 
-                        SET ${field} = ?
+                let date = new Date()
+                db.run(`UPDATE notes 
+                        SET ${field} = ?, dateUpdate = ${date}
                         WHERE id = ${this._id};`, value, (err) => {
                     if (err) {
                         reject(err);
@@ -109,9 +118,9 @@ class User {
         }
 
         let promise = new Promise((resolve, reject) => {
-            updateUser()
+            updateNote()
                 .then(() => {
-                    resolve(User.find("id", this._id))
+                    resolve(Note.find("id", this._id))
                 })
                 .catch((err) => {
                     reject(err)})
@@ -122,4 +131,4 @@ class User {
 
 }
 
-module.exports = User
+module.exports = Note

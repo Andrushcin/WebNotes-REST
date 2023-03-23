@@ -10,11 +10,11 @@
               </div>
               <div class="my-2">
                   <label for="passwordField" class="form-label">Пароль</label>
-                  <input v-model="password" id="passwordField" class="form-control">
+                  <input v-model="password" id="passwordField" class="form-control" type="password">
               </div>
               <div class="my-2">
                   <label for="passwordField2" class="form-label">Повторите пароль</label>
-                  <input v-model="password2" id="passwordField2" class="form-control">
+                  <input v-model="password2" id="passwordField2" class="form-control" type="password">
               </div>
               <p v-if="password != password2 & password2 != ''">Пароли не совпадают</p>
               <p v-if="password.length < 8 & password != ''">Пароль слишком короткий</p>
@@ -31,8 +31,6 @@
                   <RouterLink class="ml-2" to="/">Узнайте о функциях сайта WebNotes</RouterLink>
               </small>
           </div>
-
-          <button @click="seeStorage()">Глядеть localStorage</button>
     </div>
 </template>
 
@@ -42,42 +40,44 @@ import { RouterLink } from 'vue-router'
 import {$host, $authHost} from "./../http";
 
 export default {
-    data () {
+    data() {
         return {
             email: "",
             password: "",
             password2: "",
             error: "",
-        }
+            warning: "",
+        };
     },
-    computed: {
-
+    components: {
     },
+    emits: ['msgWarn'],
+    computed: {},
     methods: {
-        async onSubmit () {
+        async onSubmit() {
             let data = {
                 email: this.email,
                 password: this.password,
-            }
-
-            let response = await $host.post("/auth/registration", data)
-            let result = await response.data
+            };
+            let response = await $host.post("/auth/registration", data);
+            let result = await response.data;
             if (result.error) {
-                this.error = result.error
-            } else {
-                localStorage.setItem('refreshToken', result.refreshToken)
-                localStorage.setItem('accessToken', result.accessToken)
-
-                this.$router.push({name: 'Мои заметки'});
+                this.error = result.error;
+            }
+            else {
+                localStorage.setItem("refreshToken", result.refreshToken);
+                localStorage.setItem("accessToken", result.accessToken);
+                if (result.warning) {
+                    this.$emit('warning', result.warning)
+                }
+                this.$router.push({ name: "Мои заметки" });
             }
         },
-
-        async seeStorage () {
-            console.log(localStorage.getItem("refreshToken"))
-            console.log(localStorage.getItem("accessToken"))
-        }
-
-    }
+        async seeStorage() {
+            console.log(localStorage.getItem("refreshToken"));
+            console.log(localStorage.getItem("accessToken"));
+        },
+    },
 
 }
 </script>

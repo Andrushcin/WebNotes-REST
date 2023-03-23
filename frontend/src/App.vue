@@ -4,7 +4,8 @@
 <body class="bg-light">
   <div style="min-height: calc(100vh - 50px)">
     <MainNavbar />
-    <RouterView />
+    <AlertMessage :message="warning" v-if="warning"/>
+    <RouterView @warning="(msg) => warning = msg" />
   </div>
 </body>
 <MainFooter />
@@ -16,14 +17,26 @@ import { RouterView } from 'vue-router'
 import MainNavbar from './components/MainNavbar.vue'
 import MainFooter from './components/MainFooter.vue'
 import NotesView from './views/NotesView.vue'
+import NotePage from './views/NotePage.vue'
+import AlertMessage from './components/AlertMessage.vue'
 
 export default {
   name: "App",
+  data () {
+    return {
+      warning: "",
+    }
+  },
+  methods: {
+  },
   components: {
     MainNavbar,
     MainFooter,
     NotesView,
-  }
+    AlertMessage,
+    NotePage,
+  },
+
 }
 </script>
 

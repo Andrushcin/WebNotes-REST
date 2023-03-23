@@ -5,7 +5,7 @@ const uuid = require('uuid');
 const jwt = require('jsonwebtoken');
 const emailService = require('./emailService');
 const tokenService = require('./tokenService');
-const { UserAlreadyExist, IncorrectActivationLink } = require('../localErrors');
+const { UserAlreadyExist, IncorrectActivationLink, ErrorSendingActivationEmail } = require('../localErrors');
 
 class UserService {
     async registration(email, password) {
@@ -23,7 +23,9 @@ class UserService {
         }
         const tokens = tokenService.generateTokens(payload);
         tokenService.saveToken(email, tokens.refreshToken);
-        emailService.sendActivationMail(email, `${process.env.API_URL}/auth/activate/`+activationLink);
+
+        await emailService.sendActivationMail(email, `${process.env.API_URL}/auth/activate/`+activationLink);
+
 
         let userData = {
             userId: user._id,

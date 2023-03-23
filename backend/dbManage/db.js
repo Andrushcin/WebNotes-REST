@@ -14,11 +14,17 @@ db.serialize(() => {
     `
     db.run(sqlUsers);
 
-    let sqlToken = `
+    let sqlTokens = `
     CREATE TABLE IF NOT EXISTS tokens
             (id integer primary key, userEmail text, refreshToken text)
     `
-    db.run(sqlToken)
+    db.run(sqlTokens)
+
+    let sqlNotes = `
+    CREATE TABLE IF NOT EXISTS notes
+            (id integer primary key, userEmail text, name text, body text, fav integer, deleted integer, dateUpdate text, dateCreate text)
+    `
+    db.run(sqlNotes)
 })
 
 module.exports = db

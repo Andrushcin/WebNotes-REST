@@ -15,4 +15,21 @@ class IncorrectActivationLink extends Error {
     }    
 }
 
-module.exports = { UserAlreadyExist, IncorrectActivationLink };
+class ErrorSendingActivationEmail extends Error {
+    constructor() {
+        let message = `Вы зарегистрированы! Однако выслать письмо с ссылкой для активации аккаунта не удалось. 
+        Попробуйте активировать аккаунт позже в личном кабинете.`;
+        super(message);
+        this.name = "ErrorSendingActivationEmail";
+    }    
+}
+
+class UserIsNotAuthorized extends Error {
+    constructor() {
+        let message = `Вы не авторизованы! Ваши записи удалятся после перезагрузки страницы.`;
+        super(message);
+        this.name = "UserIsNotAuthorized";
+    }    
+}
+
+module.exports = { UserAlreadyExist, IncorrectActivationLink, ErrorSendingActivationEmail, UserIsNotAuthorized };

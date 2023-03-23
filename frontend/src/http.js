@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const apiUrl = "http://localhost:7000"
+const apiUrl = "http://localhost:5000"
 
 const $host = axios.create({
     baseURL: apiUrl,

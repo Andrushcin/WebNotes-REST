@@ -5,7 +5,7 @@ const tokenService = require('./../service/tokenService');
 //const { validationResult } = require('express-validator')
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { UserAlreadyExist, IncorrectActivationLink } = require('../localErrors');
+const { UserAlreadyExist, IncorrectActivationLink, ErrorSendingActivationEmail } = require('../localErrors');
 
 const generateAccessToken = (id, email, roles) => {
     const payload = {
@@ -30,6 +30,9 @@ class authController {
             console.log(e)
             if (e instanceof UserAlreadyExist) {
                 return res.json({error: e.message})
+            }
+            if (e instanceof ErrorSendingActivationEmail) {
+                return res.json({warning: e.message})
             }
             return res.json({error: "Произошла ошибка на сервере, попробуйте позже"});
         }
