@@ -7,6 +7,22 @@ class UserAlreadyExist extends Error {
     }    
 }
 
+class UserDoesNotExist extends Error {
+    constructor(email) {
+        super(email);
+        this.message = `Пользователя с email ${email} не существует`;
+        this.name = "UserDoesNotExist";
+    }    
+}
+
+class IncorrectPassword extends Error {
+    constructor() {
+        this.message = `Неверный пароль`;
+        super(message);
+        this.name = "IncorrectPassword";
+    }    
+}
+
 class IncorrectActivationLink extends Error {
     constructor() {
         let message = 'Некорректная ссылка активации';
@@ -32,4 +48,12 @@ class UserIsNotAuthorized extends Error {
     }    
 }
 
-module.exports = { UserAlreadyExist, IncorrectActivationLink, ErrorSendingActivationEmail, UserIsNotAuthorized };
+class UnknownError extends Error {
+    constructor() {
+        let message = `Произошла неизвестная ошибка на сервере, попробуйте позже.`;
+        super(message);
+        this.name = "UnknownError";
+    }    
+}
+
+module.exports = { UserAlreadyExist, IncorrectActivationLink, ErrorSendingActivationEmail, UserIsNotAuthorized, UnknownError, UserDoesNotExist, IncorrectPassword };

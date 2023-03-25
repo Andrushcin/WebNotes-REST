@@ -5,8 +5,7 @@ const RefreshIfExpired = async (f, params) => {
 
     let response = await f(...params)
     let result = await response.data
-
-    if (result.error == "JwtExpired") {
+    if (result.error.name == "TokenExpiredError") {
         let data = {
             refreshToken: localStorage.getItem('refreshToken')
         };

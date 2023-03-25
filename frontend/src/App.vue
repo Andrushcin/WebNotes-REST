@@ -1,11 +1,12 @@
 <template>
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+<link rel="shortcut icon" type="image/png" href="./assets/icons/favicon.png"/>
 
 <body class="bg-light">
   <div style="min-height: calc(100vh - 50px)">
     <MainNavbar />
-    <AlertMessage :message="warning" v-if="warning"/>
-    <RouterView @warning="(msg) => warning = msg" />
+    <AlertMessage :message="alertMsg.message" :type="alertMsg.type" v-if="alertMsg"/>
+    <RouterView @alert-message="(alert) => this.alertMsg = alert"/>
   </div>
 </body>
 <MainFooter />
@@ -24,7 +25,7 @@ export default {
   name: "App",
   data () {
     return {
-      warning: "",
+      alertMsg: Object,
     }
   },
   methods: {

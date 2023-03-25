@@ -23,8 +23,8 @@ class EmailService {
                 html:
                 `
                 <div>
-                    <h1>Для активации перейдите по ссылке</h1>
-                    <a href="${link}">${link}</a>
+                    <h1>Для активации перейдите по</h1>
+                    <a href="${link}">ссылке</a>
                 </div>
                 `
             })

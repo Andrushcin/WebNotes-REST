@@ -18,6 +18,19 @@ class TokenService {
             await new Token(email, refreshToken).create();
         }
     }
+    async refresh(token) {
+        const decodedData = jwt.verify(token, process.env.JWT_REFRESH_SECRET)
+        console.log(decodedData)
+        let payload = {
+            email: decodedData.email,
+        }
+        const tokens = this.generateTokens(payload);
+        this.saveToken(decodedData.email, tokens.refreshToken);
+        return {
+            refreshToken: tokens.refreshToken,
+            accessToken: tokens.accessToken,
+        }
+    }
 }
 
 module.exports = new TokenService();

@@ -14,19 +14,19 @@
                     </li>
 
                     <li class="nav-item">
-                        <RouterLink to="/" class="nav-link">Выйти</RouterLink>
+                        <RouterLink to="/auth/logout" class="nav-link">Выйти</RouterLink>
                     </li>
 
                     <li class="nav-item">
-                        <RouterLink to="/register" class="nav-link">Регистрация</RouterLink>
+                        <RouterLink to="/auth/register" class="nav-link">Регистрация</RouterLink>
                     </li>
 
                     <li class="nav-item">
-                        <RouterLink to="/" class="nav-link">Вход</RouterLink>
+                        <RouterLink to="/auth/login" class="nav-link">Вход</RouterLink>
                     </li>
 
                     <li class="nav-item">
-                        <RouterLink to="/" class="nav-link">Инфо</RouterLink>
+                        <RouterLink to="/info" class="nav-link">Инфо</RouterLink>
                     </li>
                 </ul>
             </div>

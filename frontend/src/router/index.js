@@ -4,23 +4,38 @@ import NotePage from '../views/NotePage.vue'
 
 const routes = [
   {
-    path: '/',
-    name: 'Мои заметки',
-    component: NotesView
-  },
-  {
-    path: '/register',
-    name: 'Регистрация',
+    path: '/auth/register',
+    name: 'SignUp',
     component: () => import('../views/RegisterView.vue')
   },
   {
+    path: '/auth/login',
+    name: 'SignIn',
+    component: () => import('../views/LoginView.vue')
+  },
+  {
+    path: '/auth/logout',
+    name: 'Logout',
+    component: () => import('../views/LogoutView.vue')
+  },
+  {
+    path: '/auth/activate/:link',
+    name: 'Activate',
+    component: () => import('../views/ActivateView.vue')
+  },
+  {
+    path: '/',
+    name: 'MyMotes',
+    component: NotesView
+  },
+  {
     path: '/notes/new',
-    name: 'Новая заметка',
+    name: 'NewNote',
     component: NotePage
   },
   {
-    path: '/notes/:id/edit',
-    name: 'note',
+    path: '/notes/:id',
+    name: 'Note',
     component: NotePage
   },
 ]

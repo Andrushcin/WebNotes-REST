@@ -7,7 +7,7 @@
 
         <!--<RouterLink to="/trash" v-if="!trash" class="btn btn-outline-dark btn-sm"><i class="bi bi-trash me-1"></i>Корзина</RouterLink>-->
 
-        <RouterLink to="/" v-if="trash" class="btn btn-sm btn-outline-dark"><i class="bi bi-arrow-left me-1"></i>Назад</RouterLink>
+        <RouterLink to="/" v-if="trash" class="btn btn-sm btn-outline-dark"><i class="bi bi-arrow-left me-1"></i>В заметки</RouterLink>
 
         <div class="d-flex justify-content-sm-center m-1">
             <div class="input-group input-group-sm">
