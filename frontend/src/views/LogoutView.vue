@@ -16,21 +16,19 @@ export default {
             note: Object,
         }
     },
+    emits: ['alert-message'],
+
     async created () {
-        await RefreshIfExpired($authHost.get, [`/auth/logout`])
+        await RefreshIfExpired($authHost.get, [`/auth/logout`], this)
         localStorage.clear()
-        this.$emit('warning', "Вы вышли из аккаунта")
+        this.$emit('alertMessage', {message: "Вы вышли из аккаунта", type: "success"})
     },
     computed: {
 
     },
     methods: {
-        async save () {
-            let response = await RefreshIfExpired($authHost.post, ['/notes/new', this.note])
-            let result = await response.data;
 
-        }
     },
 }
 </script>
-        
+     

@@ -4,6 +4,7 @@ const UserService = require('./../service/userService')
 const tokenService = require('./../service/tokenService');
 const { ErrorInfo } = require('./../service/errorService');
 //const { validationResult } = require('express-validator')
+const uuid = require('uuid');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const errs = require('../localErrors');
@@ -31,9 +32,31 @@ class authController {
         }
     }
 
+    async login_anonymous(req, res, next) {
+        try {
+            const id = uuid.v4();
+            const user = await new User(id, null, null, null, true).create();
+            let payload = {
+                userId: user.id,
+            }
+            const tokens = tokenService.generateTokens(payload);
+            tokenService.saveToken(user.id, tokens.refreshToken);
+
+            const userData = {
+                refreshToken: tokens.refreshToken,
+                accessToken: tokens.accessToken,
+            }
+            return res.json(userData)
+        } catch (e) {
+            let error = ErrorInfo(e, [])
+            return res.json({ error: error });
+        }
+    }
+
     async logout(req, res, next) {
         try {
-            await Token.find("userEmail", res.userEmail).delete()
+            let token = await Token.find("userId", res.userId)
+            await token.delete()
             return res.json({status: "TokenDeleted"})
         } catch (e) {
             let error = ErrorInfo(e, [])

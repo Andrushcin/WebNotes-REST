@@ -1,11 +1,10 @@
 <template>
-    <div :class="alertClass" v-if="active">
+    <div :class="alertClass" v-if="active && message">
         {{ message }}
     </div>
 </template>
 
 <script>
-
 export default {
     name: "AlertMessage",
     props: ['message', 'type'],

@@ -5,7 +5,7 @@
 <body class="bg-light">
   <div style="min-height: calc(100vh - 50px)">
     <MainNavbar />
-    <AlertMessage :message="alertMsg.message" :type="alertMsg.type" v-if="alertMsg"/>
+    <AlertMessage :message="alertMsg.message" :type="alertMsg.type"/>
     <RouterView @alert-message="(alert) => this.alertMsg = alert"/>
   </div>
 </body>

@@ -1,8 +1,8 @@
 const db = require('./db')
 
 class Note {
-    constructor(userEmail, name, body, fav=false, deleted=false, dateUpdate, dateCreate, id=null) {
-        this.userEmail = userEmail;
+    constructor(userId, name, body, fav=false, deleted=false, dateUpdate, dateCreate, id=null) {
+        this.userId = userId;
         this.name = name;
         this.body = body;
         this.fav = fav;
@@ -13,11 +13,11 @@ class Note {
     }
     
     async create() {
-        let sql = `INSERT INTO notes(userEmail, name, body, fav, deleted, dateUpdate, dateCreate)
+        let sql = `INSERT INTO notes(userId, name, body, fav, deleted, dateUpdate, dateCreate)
             VALUES(?, ?, ?, ?, ?, ?, ?)`
         const createNote = () => { 
             let promise = new Promise((resolve, reject) => {
-                db.run(sql, [this.userEmail, this.name, this.body, this.fav, this.deleted, new Date(), new Date()], (err) => {
+                db.run(sql, [this.userId, this.name, this.body, this.fav, this.deleted, new Date(), new Date()], (err) => {
                     if (err) {
                         reject(err);
                     }
@@ -30,7 +30,7 @@ class Note {
         let promise = new Promise((resolve, reject) => {
             createNote()
                 .then(() => {
-                    resolve(Note.find("userEmail", this.userEmail))
+                    resolve(Note.find("userId", this.userId))
                 })
                 .catch((err) => {
                     reject(err)})
@@ -40,7 +40,7 @@ class Note {
     }
 
     static async find(field="", value="") {
-        let allowedFields = ["id", "userEmail", "fav", "deleted"]
+        let allowedFields = ["id", "userId", "fav", "deleted"]
 
         if (!allowedFields.some((elem) => elem == field)) {
             throw new Error(`Недопустимый тип поля field: "${field}". Разрешённые типы: ${allowedFields}`)
@@ -65,7 +65,7 @@ class Note {
                     if (rows.length > 0) {
                         let arr = Array();
                         for (let i=0; i < rows.length; i++) {
-                            let u = new Note(rows[i].userEmail, rows[i].name, rows[i].body, rows[i].fav, rows[i].deleted, rows[i].dateUpdate, rows[i].dateCreate, rows[i].id)
+                            let u = new Note(rows[i].userId, rows[i].name, rows[i].body, rows[i].fav, rows[i].deleted, rows[i].dateUpdate, rows[i].dateCreate, rows[i].id)
                             arr.push(u)
                         }
 
@@ -84,7 +84,7 @@ class Note {
     async delete() {
         let promise = new Promise((resolve, reject) => {
 
-            db.all(`DELETE FROM notes WHERE userEmail = ?`, this.userEmail, (err) => {
+            db.all(`DELETE FROM notes WHERE userId = ?`, this.userId, (err) => {
                 if (err) {
                     reject(err);
                 }
@@ -95,7 +95,7 @@ class Note {
     }
 
     async update(field, value) {
-        let allowedFields = ["userEmail", "name", "body", "fav", "deleted"]
+        let allowedFields = ["userId", "name", "body", "fav", "deleted"]
 
         if (!allowedFields.some((elem) => elem == field)) {
             throw new Error(`Недопустимый тип поля field: "${field}". Разрешённые типы: ${allowedFields}`)
@@ -106,9 +106,10 @@ class Note {
                 console.log(field, value)
                 let date = new Date()
                 db.run(`UPDATE notes 
-                        SET ${field} = ?, dateUpdate = ${date}
-                        WHERE id = ${this._id};`, value, (err) => {
+                        SET ${field} = ?, dateUpdate = ?
+                        WHERE id = ${this._id};`, [value, date], (err) => {
                     if (err) {
+                        console.log(date)
                         reject(err);
                     }
                     resolve();

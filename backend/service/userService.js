@@ -17,17 +17,18 @@ class UserService {
         const hashPassword = bcrypt.hashSync(password, 7);
         const activationLink = uuid.v4();
 
-        const user = new User(email, hashPassword, activationLink);
+        const user = new User(uuid.v4(), email, hashPassword, activationLink);
         let payload = {
-            email: email,
+            userId: user.id,
         }
         const tokens = tokenService.generateTokens(payload);
-        tokenService.saveToken(email, tokens.refreshToken);
+        tokenService.saveToken(user.id, tokens.refreshToken);
 
         await emailService.sendActivationMail(email, `${process.env.APP_URL}/auth/activate/`+activationLink);
 
         await user.create()
         let userData = {
+            userId: user.id,
             email: user.email,
             refreshToken: tokens.refreshToken,
             accessToken: tokens.accessToken,
@@ -48,15 +49,14 @@ class UserService {
             }
 
             let payload = {
-                email: email,
+                userId: user.id,
             }
             const tokens = tokenService.generateTokens(payload);
-
-            await tokenService.saveToken(email, tokens.refreshToken);
+            tokenService.saveToken(user._id, tokens.refreshToken);
 
             const userData = {
-                userId: user._id,
-                userEmail: user.email,
+                userId: user.id,
+                email: user.email,
                 refreshToken: tokens.refreshToken,
                 accessToken: tokens.accessToken,
                 isActivated: user.isActivated,

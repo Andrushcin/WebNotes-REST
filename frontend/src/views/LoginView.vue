@@ -17,10 +17,9 @@
               <button v-if="email != '' & password.length > 8" class="btn btn-primary mt-2" type="submit">Войти</button>
           </form>
   
-          <div class="border-top border-warning mt-2 d-flex flex-column">
-              <small class="text-muted">
-                  Ещё не зарегистрированы?<RouterLink to="/auth/register" class="ml-2">Регистрация</RouterLink>
-              </small>
+          <div class="border-top border-warning mt-2 d-flex flex-row justify-content-between">
+              <RouterLink to="/auth/register" class="btn btn-sm btn-outline-primary mt-2 ml-2">Регистрация</RouterLink>
+              <button class="btn btn-sm btn-outline-primary mt-2 ml-2" @click="loginAsAnonymous()">Войти как анонимный пользователь</button>
           </div>
     </div>
 </template>
@@ -29,6 +28,7 @@
 /* eslint-disable */
 import { RouterLink } from 'vue-router'
 import {$host, $authHost} from "./../http";
+import { loginAnonymous } from "./../auth";
 
 export default {
     data() {
@@ -37,12 +37,11 @@ export default {
             password: "",
             password2: "",
             error: "",
-            warning: "",
         };
     },
     components: {
     },
-    emits: ['msgWarn'],
+    emits: ['alert-message'],
     computed: {},
     methods: {
         async onSubmit() {
@@ -58,16 +57,13 @@ export default {
             else {
                 localStorage.setItem("refreshToken", result.refreshToken);
                 localStorage.setItem("accessToken", result.accessToken);
-                if (result.warning) {
-                    this.$emit('warning', result.warning)
-                }
+                this.$emit('alertMessage', {message: "Вы вошли в аккаунт", type: "success"})
                 this.$router.push({ name: "MyNotes" });
             }
         },
-        async seeStorage() {
-            console.log(localStorage.getItem("refreshToken"));
-            console.log(localStorage.getItem("accessToken"));
-        },
+        async loginAsAnonymous() {
+            await loginAnonymous(this)
+        }
     },
 
 }

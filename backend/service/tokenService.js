@@ -3,29 +3,29 @@ const Token = require('./../dbManage/token');
 
 class TokenService {
     generateTokens(payload) {
-        const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {expiresIn: '1m'})
-        const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET, {expiresIn: '30d'})
+        const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {expiresIn: '30s'})
+        const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET, {expiresIn: '30m'})
         return {
             accessToken,
             refreshToken
         }
     }
-    async saveToken(email, refreshToken) {
-        let token = await Token.find("userEmail", email);
+    async saveToken(userId, refreshToken) {
+        let token = await Token.find("userId", userId);
         if (token) {
             await token.update("refreshToken", refreshToken)
         } else {
-            await new Token(email, refreshToken).create();
+            await new Token(userId, refreshToken).create();
         }
     }
     async refresh(token) {
         const decodedData = jwt.verify(token, process.env.JWT_REFRESH_SECRET)
         console.log(decodedData)
         let payload = {
-            email: decodedData.email,
+            userId: decodedData.userId,
         }
         const tokens = this.generateTokens(payload);
-        this.saveToken(decodedData.email, tokens.refreshToken);
+        this.saveToken(decodedData.userId, tokens.refreshToken);
         return {
             refreshToken: tokens.refreshToken,
             accessToken: tokens.accessToken,

@@ -1,4 +1,5 @@
-import axios from 'axios'
+import axios from 'axios';
+//import errs from "./errors";
 
 const apiUrl = "http://localhost:5000"
 
@@ -13,7 +14,8 @@ const $authHost = axios.create({
 })
 
 const authInterceptor = config => {
-    config.headers.authorization = `Bearer ${localStorage.getItem('accessToken')}`
+    const accessToken = localStorage.getItem('accessToken');
+    config.headers.authorization = `Bearer ${accessToken}`
     return config
 }
 

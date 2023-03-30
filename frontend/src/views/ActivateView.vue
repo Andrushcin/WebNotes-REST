@@ -12,6 +12,7 @@ export default {
             message: String,
         }
     },
+    emits: ['alert-message'],
     async created () {
         let link = this.$route.params.link;
         let response = await $host.get(`auth/activate/${link}`)
@@ -35,4 +36,3 @@ export default {
     },
 }
 </script>
-        

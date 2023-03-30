@@ -31,7 +31,7 @@
     <div v-for="note in notes" :key="note._id" class="my-1 p-2 d-flex flex-row align-items-center border border-dark rounded">
         <div v-if="note.fav" class="star me-2"></div>
         
-        <button @click="$router.push({ name:'note', params: { id:note._id} })" style="border: none; background: none" class="flex-grow-1 d-flex flex-start text-break text-dark ms-2">{{ note.name }}</button>
+        <button @click="$router.push({ name:'Note', params: { id:note._id } })" style="border: none; background: none" class="flex-grow-1 d-flex flex-start text-break text-dark ms-2">{{ note.name }}</button>
 
         <div v-if="!trash" class="ms-2">
             <button type="submit" style="border: none; background: none"><a href=""><i class="bi bi-star"></i></a></button>
@@ -64,9 +64,10 @@ export default {
         }
     },
     async created () {
-        let response = await RefreshIfExpired($authHost.get, ["/notes"])
+        let response = await RefreshIfExpired($authHost.get, ["/notes"], this)
         let result = await response.data
-        console.log(await result.notes)
+        //this.$router.push({ name: "SignIn" })
+        console.log(result)
         this.notes = result.notes;
     },
     computed: {

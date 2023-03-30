@@ -1,11 +1,14 @@
 const User = require('./../dbManage/user')
 const Note = require('./../dbManage/note')
+const errs = require('../localErrors');
+const { ErrorInfo } = require('./../service/errorService');
 
 class notesController {
     async getAll(req, res, next) {
         try {
-            let userEmail = res.userEmail;
-            let notes = await Note.find("userEmail", userEmail)
+            let userId = res.userId;
+            console.log(userId)
+            let notes = await Note.find("userId", userId)
             console.log(notes)
             return res.json({notes: notes})
         } catch (e) {
@@ -18,40 +21,62 @@ class notesController {
         try {
             let noteId = req.params.id
             let note = await Note.find("id", noteId)
+
+            if (res.userId != note[0].userId) {
+                throw new errs.NoAccess()
+            }
             return res.json({note: note[0]})
         } catch (e) {
-            console.log(e)
-            return res.json({error: "Неизвестная ошибка, попробуйте позже"})
+            let error = ErrorInfo(e, [errs.NoAccess])
+            return res.json({ error: error });
         }
     }
 
     async create(req, res, next) {
         try {
             console.log(req.body)
-            new Note(res.userEmail, req.body.name || "", req.body.body || "", req.body.fav || 0, req.body.deleted || 0).create();
+            await new Note(res.userId, req.body.name || "", req.body.body || "", req.body.fav || 0, req.body.deleted || 0).create();
             return res.json({success: true})
         } catch (e) {
-            console.log(e)
-            return res.json({error: "Неизвестная ошибка, попробуйте позже"})
+            let error = ErrorInfo(e, [])
+            return res.json({ error: error });
         }
     }
 
     async update(req, res, next) {
         try {
             let noteId = req.params.id
-            let note = Note.find('id', noteId)
+            let note = await Note.find('id', noteId)
+            note = await note[0]
+            if (res.userId != note.userId) {
+                throw new errs.NoAccess()
+            }
+            console.log(req.body)
 
-            
-            note.update()
+            for (let key in note) {
+                if (key in req.body && note[key] != req.body[key]) {
+                    await note.update(`${key}`, req.body[key])
+                }
+            }
         } catch (e) {
-            
+            let error = ErrorInfo(e, [errs.NoAccess])
+            return res.json({ error: error });
         }
     }
+
     async delete(req, res, next) {
         try {
-
+            let noteId = req.params.id
+            let note = await Note.find('id', noteId)
+            note = await note[0]
+            if (res.userId != note.userId) {
+                throw new errs.NoAccess()
+            }
+            await note.delete()
+            return res.json({success: true})
         } catch (e) {
-            
+            let error = ErrorInfo(e, [errs.NoAccess])
+            return res.json({ error: error });
         }
     }
 }

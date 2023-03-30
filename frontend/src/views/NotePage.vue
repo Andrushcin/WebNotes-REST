@@ -30,7 +30,7 @@
 		</div>
 
 		<div class="form-group ms-2">
-			<input class="btn btn-danger mt-2 align-self-end" type="submit" value="Удалить" form="delete">
+			<button @click="deleteNote()" v-if="!newNote" class="btn btn-danger mt-2 align-self-end">Удалить</button>
 		</div>
 	</div>
 
@@ -59,7 +59,7 @@ export default {
         let id = this.$route.params.id
         console.log(id)
         if (id) {
-            let response = await RefreshIfExpired($authHost.get, [`/notes/${id}`])
+            let response = await RefreshIfExpired($authHost.get, [`/notes/${id}`], this)
             let result = await response.data
             console.log(result)
             this.newNote = false;
@@ -79,14 +79,37 @@ export default {
     },
     methods: {
         async save () {
-            let response = await RefreshIfExpired($authHost.post, ['/notes/new', this.note])
+            if (this.newNote) {
+                let response = await RefreshIfExpired($authHost.post, ['/notes/new', this.note], this)
+                let result = await response.data;
+                console.log(result)
+                if (result.error) {
+                    console.log(result.error)
+                } else {
+                    this.$router.push({ name: "MyNotes" });
+                }
+            } else {
+                let response = await RefreshIfExpired($authHost.post, [`/notes/${this.$route.params.id}/edit`, this.note], this)
+                let result = await response.data;
+                console.log(result)
+                if (result.error) {
+                    console.log(result.error)
+                } else {
+                    this.$router.push({ name: "MyNotes" });
+                }
+            }
+        },
+
+        async deleteNote () {
+            let response = await RefreshIfExpired($authHost.post, [`/notes/${this.$route.params.id}/delete`], this)
             let result = await response.data;
+            console.log(result)
             if (result.error) {
                 console.log(result.error)
             } else {
-                this.$router.push({ name: "Мои заметки" });
+                this.$router.push({ name: "MyNotes" });
             }
-        }
+        },
     },
 }
 </script>

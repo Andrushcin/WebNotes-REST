@@ -46,12 +46,11 @@ export default {
             password: "",
             password2: "",
             error: "",
-            warning: "",
         };
     },
     components: {
     },
-    emits: ['msgWarn'],
+    emits: ['alert-message'],
     computed: {},
     methods: {
         async onSubmit() {
@@ -61,21 +60,15 @@ export default {
             };
             let response = await $host.post("/auth/registration", data);
             let result = await response.data;
-            if (result.error) {
+            if (result.error) {       
                 this.error = result.error;
-            }
-            else {
+            } else {
                 localStorage.setItem("refreshToken", result.refreshToken);
                 localStorage.setItem("accessToken", result.accessToken);
-                if (result.warning) {
-                    this.$emit('warning', result.warning)
-                }
-                this.$router.push({ name: "Мои заметки" });
+ 
+                this.$emit('alertMessage', {message: "Вы успешно зарегистрированы! Проверьте почту и активируйте аккаунт.", type: "success"})
+                this.$router.push({ name: "MyNotes" });
             }
-        },
-        async seeStorage() {
-            console.log(localStorage.getItem("refreshToken"));
-            console.log(localStorage.getItem("accessToken"));
         },
     },
 

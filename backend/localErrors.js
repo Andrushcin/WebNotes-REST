@@ -56,4 +56,11 @@ class UnknownError extends Error {
     }    
 }
 
-module.exports = { UserAlreadyExist, IncorrectActivationLink, ErrorSendingActivationEmail, UserIsNotAuthorized, UnknownError, UserDoesNotExist, IncorrectPassword };
+class NoAccess extends Error {
+    constructor() {
+        let message = `У вас нет доступа к этой странице.`;
+        super(message);
+        this.name = "NoAccess";
+    }
+}
+module.exports = { UserAlreadyExist, IncorrectActivationLink, ErrorSendingActivationEmail, UserIsNotAuthorized, UnknownError, UserDoesNotExist, IncorrectPassword, NoAccess };

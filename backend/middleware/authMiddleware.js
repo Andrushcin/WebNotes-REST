@@ -10,10 +10,11 @@ module.exports = function () {
             }
             const token = req.headers.authorization.split(' ')[1]
             const decodedData = jwt.verify(token, process.env.JWT_ACCESS_SECRET)
-            res.userEmail = decodedData.email;
+            res.userId = decodedData.userId;
+            console.log(decodedData.userId)
             next()
         } catch (e) {
-            let error = ErrorInfo(e, [errs.UserIsNotAuthorized, jwt.TokenExpiredError])
+            let error = ErrorInfo(e, [errs.UserIsNotAuthorized, jwt.TokenExpiredError, jwt.JsonWebTokenError])
             return res.json({ error: error });
         }
     }

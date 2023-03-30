@@ -10,19 +10,19 @@ let db = new sqlite3.Database('main.db', (err) => {
 db.serialize(() => {
     let sqlUsers = `
     CREATE TABLE IF NOT EXISTS users
-            (id integer primary key, email text, password text, activationLink text, isActivated integer)
+            (id text, email text, password text, activationLink text, anonymous integer, isActivated integer)
     `
     db.run(sqlUsers);
 
     let sqlTokens = `
     CREATE TABLE IF NOT EXISTS tokens
-            (id integer primary key, userEmail text, refreshToken text)
+            (id integer primary key, userId integer, refreshToken text)
     `
     db.run(sqlTokens)
 
     let sqlNotes = `
     CREATE TABLE IF NOT EXISTS notes
-            (id integer primary key, userEmail text, name text, body text, fav integer, deleted integer, dateUpdate text, dateCreate text)
+            (id integer primary key, userId integer, name text, body text, fav integer, deleted integer, dateUpdate text, dateCreate text)
     `
     db.run(sqlNotes)
 })
