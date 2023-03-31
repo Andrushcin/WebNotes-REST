@@ -1,7 +1,7 @@
 import axios from 'axios';
 //import errs from "./errors";
 
-const apiUrl = "http://localhost:5000"
+const apiUrl = "http://192.168.1.153:5000"
 
 const $host = axios.create({
     baseURL: apiUrl,

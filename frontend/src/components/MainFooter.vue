@@ -5,8 +5,9 @@
 </template>
 
 <script>
-
+/* eslint-disable */
 export default {
     name: "MainFooter",
+    props: ['theme'],
 }
 </script>

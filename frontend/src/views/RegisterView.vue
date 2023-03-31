@@ -1,19 +1,19 @@
 <template>
-    <div class="mx-auto my-2 px-2 col-xs-12 col-sm-10 col-md-8 col-lg-6 col-xl-4">
+    <div class="p-3 mx-3 bg-dark rounded" style="margin-top: 20px; margin-bottom: 20px;">
           <form @submit.prevent="onSubmit">
               <fieldset class="form-group">
-                  <legend class="border-bottom border-warning mb-3">Регистрация в WebNotes</legend>
+                  <legend class="border-bottom border-warning mb-3 text-light">Регистрация в WebNotes</legend>
               </fieldset>
               <div class="my-2">
-                  <label for="emailField" class="form-label">Адрес электронной почты</label>
+                  <label for="emailField" class="form-label text-light">Адрес электронной почты</label>
                   <input v-model="email" id="emailField" type="email" class="form-control">
               </div>
               <div class="my-2">
-                  <label for="passwordField" class="form-label">Пароль</label>
+                  <label for="passwordField" class="form-label text-light">Пароль</label>
                   <input v-model="password" id="passwordField" class="form-control" type="password">
               </div>
               <div class="my-2">
-                  <label for="passwordField2" class="form-label">Повторите пароль</label>
+                  <label for="passwordField2" class="form-label text-light">Повторите пароль</label>
                   <input v-model="password2" id="passwordField2" class="form-control" type="password">
               </div>
               <p v-if="password != password2 & password2 != ''">Пароли не совпадают</p>

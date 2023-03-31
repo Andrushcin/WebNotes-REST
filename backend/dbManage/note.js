@@ -17,7 +17,8 @@ class Note {
             VALUES(?, ?, ?, ?, ?, ?, ?)`
         const createNote = () => { 
             let promise = new Promise((resolve, reject) => {
-                db.run(sql, [this.userId, this.name, this.body, this.fav, this.deleted, new Date(), new Date()], (err) => {
+                let date = new Date()
+                db.run(sql, [this.userId, this.name, this.body, this.fav, this.deleted, date.toISOString(), date.toISOString()], (err) => {
                     if (err) {
                         reject(err);
                     }
@@ -41,7 +42,7 @@ class Note {
 
     static async find(field="", value="") {
         let allowedFields = ["id", "userId", "fav", "deleted"]
-
+        const allowedOrderByParams = ["dateUpdate", "dateCreate"]
         if (!allowedFields.some((elem) => elem == field)) {
             throw new Error(`Недопустимый тип поля field: "${field}". Разрешённые типы: ${allowedFields}`)
         }
@@ -84,7 +85,7 @@ class Note {
     async delete() {
         let promise = new Promise((resolve, reject) => {
 
-            db.all(`DELETE FROM notes WHERE userId = ?`, this.userId, (err) => {
+            db.all(`DELETE FROM notes WHERE id = ?`, this._id, (err) => {
                 if (err) {
                     reject(err);
                 }
@@ -107,7 +108,7 @@ class Note {
                 let date = new Date()
                 db.run(`UPDATE notes 
                         SET ${field} = ?, dateUpdate = ?
-                        WHERE id = ${this._id};`, [value, date], (err) => {
+                        WHERE id = ${this._id};`, [value, date.toISOString()], (err) => {
                     if (err) {
                         console.log(date)
                         reject(err);

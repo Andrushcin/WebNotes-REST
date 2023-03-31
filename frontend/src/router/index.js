@@ -24,6 +24,11 @@ const routes = [
     component: () => import('../views/ActivateView.vue')
   },
   {
+    path: '/auth/login_anonymous',
+    name: 'LoginAnonymous',
+    component: () => import('../views/LoginAnonymous.vue')
+  },
+  {
     path: '/',
     name: 'MyNotes',
     component: NotesView

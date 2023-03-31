@@ -58,6 +58,7 @@ class notesController {
                     await note.update(`${key}`, req.body[key])
                 }
             }
+            return res.json({success: true})
         } catch (e) {
             let error = ErrorInfo(e, [errs.NoAccess])
             return res.json({ error: error });

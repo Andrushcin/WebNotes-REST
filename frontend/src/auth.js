@@ -67,7 +67,6 @@ const loginAnonymous = async (obj) => {
     } else {
         localStorage.setItem('refreshToken', result.refreshToken)
         localStorage.setItem('accessToken', result.accessToken)
-        obj.$router.push({ name: "MyNotes" })
     }
 }
 
